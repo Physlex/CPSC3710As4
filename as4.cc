@@ -36,6 +36,7 @@ const vec4 point[8] = {
 const int face[6][4] = {
   {0,3,2,1},  // bot
   {4,5,6,7},  // top
+  
   {4,0,1,5},  // back
   {6,2,3,7},  // front
   {5,1,2,6},  // left
@@ -45,12 +46,14 @@ const int face[6][4] = {
 
 // replace the following coordinates
 vec2 texCoord[6][4] ={
-    { vec2(0,0), vec2(0,1), vec2(1,0), vec2(1,1) }, //One of this and the lower should work... so, what is going wrong?
+    { vec2(0,0), vec2(1,0), vec2(1,1), vec2(0,1) },
     { vec2(0,0), vec2(0,1), vec2(1,1), vec2(1,0) },
-    { vec2(0,0), vec2(0,1), vec2(1,0), vec2(1,1) },
-    { vec2(0,0), vec2(0,1), vec2(1,0), vec2(1,1) },
-    { vec2(0,0), vec2(0,1), vec2(1,0), vec2(1,1) },
-    { vec2(0,0), vec2(0,1), vec2(1,0), vec2(1,1) }
+    
+    //Other 4 weird shaped ones
+    { vec2(1,0.75), vec2(1,0), vec2(0,0), vec2(0,0.25) },
+    { vec2(1,0.75), vec2(1,0), vec2(0,0), vec2(0,0.25) }, //Still not working, really dont understand texture->face
+    { vec2(1,0.75), vec2(1,0), vec2(0,0), vec2(0,0.25) },
+    { vec2(1,0.75), vec2(1,0), vec2(0,0), vec2(0,0.25) }
 };
 
 
@@ -108,7 +111,8 @@ void setTextures()
   // set up wrapping, minification and magnification parameters
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_REPEAT, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_LINEAR);
   
   int width, height, nrChannels;
   stbi_set_flip_vertically_on_load(true);
@@ -116,8 +120,7 @@ void setTextures()
 
   if (data) {
     // load image into texture, generate mipmap
-    GLubyte myTexture[687][670][3]; //Does this ever get assigned to the texture?
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 687, 670, 0, GL_RGB, GL_UNSIGNED_BYTE, myTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 687, 670, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 
@@ -283,7 +286,7 @@ void arrow(int key, int x, int y)
   case GLUT_KEY_PAGE_DOWN:
     scale *= 1.0/1.05;
     break;
-  case GLUT_KEY_F4:
+  case GLUT_KEY_HOME:
     theta_x += 0.5;
     break;
   case GLUT_KEY_END:
